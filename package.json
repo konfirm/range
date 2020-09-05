@@ -1,31 +1,36 @@
 {
-	"name": "@konfirm/range",
-	"version": "1.0.0-beta1",
-	"description": "",
-	"main": "source/main.js",
-	"scripts": {
-		"test": "./node_modules/.bin/lab -vcl",
-		"test-coverage-html": "./node_modules/.bin/lab -clr html -o report.html"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/konfirm/range.git"
-	},
-	"bugs": {
-		"url": "https://github.com/konfirm/range/issues"
-	},
-	"keywords": [
-		"range",
-		"ranges"
-	],
-	"author": "Rogier Spieker <rogier@konfirm.eu>",
-	"license": "MIT",
-	"devDependencies": {
-		"@konfirm/labrat": "^2.0.2",
-		"eslint": "^6.5.1",
-		"eslint-config-prettier": "^6.4.0",
-		"eslint-config-strict": "^14.0.1",
-		"eslint-plugin-prettier": "^3.1.1",
-		"prettier": "^1.18.2"
-	}
+  "name": "@konfirm/range",
+  "version": "1.0.0-beta1",
+  "description": "",
+  "main": "source/main.js",
+  "scripts": {
+    "test": "nyc tape test/**/*.spec.js",
+    "test:formatted": "nyc tape test/**/*.spec.js | tap-nyc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/konfirm/range.git"
+  },
+  "bugs": {
+    "url": "https://github.com/konfirm/range/issues"
+  },
+  "keywords": [
+    "range",
+    "ranges"
+  ],
+  "author": "Rogier Spieker <rogier@konfirm.eu>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.8.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-config-strict": "^14.0.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "nyc": "^15.1.0",
+    "prettier": "^2.1.1",
+    "tap-nyc": "^1.0.3",
+    "template-literal-each": "^1.0.7"
+  },
+  "dependencies": {
+    "tape": "^5.0.1"
+  }
 }
