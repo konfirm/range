@@ -124,6 +124,11 @@ class RangeCollection extends Range {
 	*[Symbol.iterator]() {
 		const { normal } = storage.get(this);
 		const { length } = normal;
+		const infinite = normal.some(({ size }) => size >= Infinity);
+
+		if (infinite) {
+			throw new Error('RangeCollection is infinite');
+		}
 
 		for (let i = 0; i < length; ++i) {
 			yield* normal[i];

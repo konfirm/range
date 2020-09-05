@@ -161,7 +161,11 @@ class Range {
 	 * @memberof Range
 	 */
 	*[Symbol.iterator]() {
-		const { min, max } = this;
+		const { min, max, size } = this;
+
+		if (size >= Infinity) {
+			throw new Error('Range is infinite');
+		}
 
 		for (let i = min; i <= max; ++i) {
 			yield i;
