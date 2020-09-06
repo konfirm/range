@@ -20,6 +20,9 @@
   ],
   "author": "Rogier Spieker <rogier@konfirm.eu>",
   "license": "MIT",
+  "engines": {
+    "node": ">=8"
+  },
   "devDependencies": {
     "eslint": "^7.8.1",
     "eslint-config-prettier": "^6.4.0",
@@ -27,10 +30,8 @@
     "eslint-plugin-prettier": "^3.1.1",
     "nyc": "^15.1.0",
     "prettier": "^2.1.1",
+    "tape": "^5.0.1",
     "tap-nyc": "^1.0.3",
     "template-literal-each": "^1.0.7"
-  },
-  "dependencies": {
-    "tape": "^5.0.1"
   }
 }
