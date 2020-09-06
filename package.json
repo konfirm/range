@@ -4,8 +4,8 @@
   "description": "",
   "main": "source/main.js",
   "scripts": {
-    "test": "nyc tape test/**/*.spec.js",
-    "test:formatted": "nyc tape test/**/*.spec.js | tap-nyc"
+    "test": "nyc tape 'test/**/*.spec.js'",
+    "test:formatted": "nyc tape 'test/**/*.spec.js' | tap-nyc"
   },
   "repository": {
     "type": "git",
