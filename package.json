@@ -1,6 +1,6 @@
 {
   "name": "@konfirm/range",
-  "version": "1.0.0-beta1",
+  "version": "1.0.0",
   "description": "",
   "main": "source/main.js",
   "scripts": {
