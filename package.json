@@ -30,8 +30,8 @@
     "eslint-plugin-prettier": "^3.1.1",
     "nyc": "^15.1.0",
     "prettier": "^2.1.1",
-    "tape": "^5.0.1",
     "tap-nyc": "^1.0.3",
-    "template-literal-each": "^1.0.7"
+    "tape": "^5.0.1",
+    "template-literal-each": "^1.0.8"
   }
 }
