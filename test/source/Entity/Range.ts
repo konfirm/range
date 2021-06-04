@@ -1,6 +1,7 @@
-const test = require('tape');
-const each = require('template-literal-each');
-const Range = require('../../../source/Entity/Range.js');
+import * as test from 'tape';
+import each from 'template-literal-each';
+import { Range } from '../../../source/Entity/Range';
+
 const und = (() => { })();
 
 test('Range', (t) => {
@@ -44,8 +45,8 @@ test('Range', (t) => {
 			${-10}       | ${-100}     | ${-100}      | ${-10}      | ${91}       | -100..-10
 			${0}         | ${Infinity} | ${0}         | ${Infinity} | ${Infinity} | 0..INF
 			${-Infinity} | ${0}        | ${-Infinity} | ${0}        | ${Infinity} | -INF..0
-		`(({ inmin, inmax, min, max, size, string }) => {
-
+		`((record) => {
+			const { inmin, inmax, min, max, size, string } = record as { string: string } & { [key: string]: number };
 			t.test(`new Range(${inmin}, ${inmax})`, (t) => {
 				const range = new Range(inmin, inmax);
 
@@ -83,11 +84,12 @@ test('Range', (t) => {
 				${[-101, 100]} | ${-100} | ${100} | false
 				${[-100, 101]} | ${-100} | ${100} | false
 				${1.23}        | ${0}    | ${100} | false
-			`(({ min, max, seek, verdict }) => {
+			`((record) => {
+				const { min, max, seek, verdict } = record as { verdict: string } & { [key: string]: number };
 				t.test(`new Range(${min}, ${max}) contains ${seek} is ${verdict}`, (t) => {
 					const range = new Range(min, max);
 					const bool = verdict === 'true';
-					const contains = [].concat(seek);
+					const contains = ([] as Array<number>).concat(seek);
 
 					t.equal(range.contains(...contains), bool, `contains ${seek} ${verdict}`);
 
@@ -256,7 +258,8 @@ test('Range', (t) => {
 				-INF#100   | ${-Infinity} | ${100}      | ${Infinity} | ${'#'}
 				100..INF   | ${100}       | ${Infinity} | ${Infinity} | ${und}
 				100!INF    | ${100}       | ${Infinity} | ${Infinity} | ${'!'}
-			`(({ from, min, max, size, separator }) => {
+			`((record) => {
+				const { from, min, max, size, separator } = record as { from: string, separator?: string } & { [key: string]: number };
 				t.test(`${from} has min ${min}, max ${max} and size ${size}`, (t) => {
 					const range = Range.fromString(from, separator);
 
@@ -283,7 +286,8 @@ test('Range', (t) => {
 				-INF#100  | ${-Infinity} | ${256}      | ${Infinity} | ${'#'}
 				100..INF  | ${256}       | ${Infinity} | ${Infinity} | ${und}
 				100!INF   | ${256}       | ${Infinity} | ${Infinity} | ${'!'}
-			`(({ from, min, max, size, separator }) => {
+			`((record) => {
+				const { from, min, max, size, separator } = record as { from: string, separator?: string } & { [key: string]: number };
 				t.test(`${from} has min ${min}, max ${max} and size ${size}`, (t) => {
 					const range = Range.fromHex(from, separator);
 
@@ -309,9 +313,10 @@ test('Range', (t) => {
 				{"min": 100 }                | ${100}       | ${100} | ${1}
 				{"max": 100 }                | ${100}       | ${100} | ${1}
 				{}                           | ${-Infinity} | ${Infinity} | ${Infinity}
-			`(({ from, min, max, size, separator }) => {
+			`((record) => {
+				const { from, min, max, size } = record as { from: string } & { [key: string]: number };
 				t.test(`${from} has min ${min}, max ${max} and size ${size}`, (t) => {
-					const range = Range.fromJSON(from, separator);
+					const range = Range.fromJSON(from);
 
 					t.equal(range.min, min, `min is ${min}`);
 					t.equal(range.max, max, `max is ${max}`);

@@ -1,14 +1,14 @@
 const storage = new WeakMap();
 const infinity = /^(-)?(Inf)(?:inity)?$/i;
 const cast = {
-	numeric: (value) =>
-		infinity.test(value)
+	numeric: (value: string | number) =>
+		infinity.test(String(value))
 			? Number(String(value).replace(infinity, '$1Infinity'))
-			: parseInt(value, 10),
-	string: (value) => String(value).replace(infinity, '$1INF'),
-	json: (value) =>
+			: parseInt(String(value), 10),
+	string: (value: string) => String(value).replace(infinity, '$1INF'),
+	json: (value: string) =>
 		infinity.test(value) ? cast.string(value) : Number(value),
-	hex: (value) =>
+	hex: (value: string) =>
 		infinity.test(value) ? cast.string(value) : parseInt(value, 16)
 };
 
@@ -17,14 +17,14 @@ const cast = {
  *
  * @class Range
  */
-class Range {
+export class Range {
 	/**
 	 * Creates an instance of Range
 	 *
 	 * @param {...number} values
 	 * @memberof Range
 	 */
-	constructor(...values) {
+	constructor(...values: Array<string | number>) {
 		const mapped = values.length
 			? values.map(cast.numeric)
 			: [-Infinity, Infinity];
@@ -76,7 +76,7 @@ class Range {
 	 * @returns {boolean} contains
 	 * @memberof Range
 	 */
-	contains(...values) {
+	contains(...values: Array<any>) {
 		const { min, max } = this;
 
 		return values.reduce(
@@ -126,7 +126,7 @@ class Range {
 				//  add padding (if needed) to true hexadecimal numbers,
 				//  never for (-)Infinity
 				if (numeric.test(normal)) {
-					const [, minus, abs] = normal.match(numeric);
+					const [, minus, abs] = normal.match(numeric) as RegExpMatchArray;
 
 					return (
 						minus +
@@ -181,7 +181,7 @@ class Range {
 	 * @returns
 	 * @memberof Range
 	 */
-	static fromString(input, separator = '..') {
+	static fromString(input: string, separator = '..') {
 		return new this(...input.split(separator));
 	}
 
@@ -194,7 +194,7 @@ class Range {
 	 * @returns
 	 * @memberof Range
 	 */
-	static fromHex(input, separator = '..') {
+	static fromHex(input: string, separator = '..') {
 		return new this(...input.split(separator).map(cast.hex));
 	}
 
@@ -206,11 +206,9 @@ class Range {
 	 * @returns
 	 * @memberof Range
 	 */
-	static fromJSON(input) {
+	static fromJSON(input: string) {
 		const { min, max } = JSON.parse(input);
 
 		return new this(min || max || -Infinity, max || min || Infinity);
 	}
 }
-
-module.exports = Range;

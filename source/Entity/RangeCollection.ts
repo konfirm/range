@@ -1,4 +1,4 @@
-const Range = require('./Range.js');
+import { Range } from './Range';
 
 const storage = new WeakMap();
 
@@ -8,17 +8,18 @@ const storage = new WeakMap();
  * @class RangeCollection
  * @extends {Range}
  */
-class RangeCollection extends Range {
+export class RangeCollection extends Range {
 	/**
 	 * Creates an instance of RangeCollection
 	 *
 	 * @param {*} ranges
 	 * @memberof RangeCollection
 	 */
-	constructor(...ranges) {
+	constructor(...ranges: Array<Range | number>) {
 		super();
 
-		const normal = this.constructor.normalize(
+		const { constructor: { normalize } } = Object.getPrototypeOf(this);
+		const normal = normalize(
 			ranges.length ? ranges : [new Range()]
 		);
 
@@ -34,7 +35,7 @@ class RangeCollection extends Range {
 	get min() {
 		const { normal } = storage.get(this);
 
-		return Math.min(...normal.map(({ min }) => min));
+		return Math.min(...(normal as Array<Range>).map(({ min }) => min));
 	}
 
 	/**
@@ -46,7 +47,7 @@ class RangeCollection extends Range {
 	get max() {
 		const { normal } = storage.get(this);
 
-		return Math.max(...normal.map(({ max }) => max));
+		return Math.max(...(normal as Array<Range>).map(({ max }) => max));
 	}
 
 	/**
@@ -58,7 +59,7 @@ class RangeCollection extends Range {
 	get size() {
 		const { normal } = storage.get(this);
 
-		return normal.reduce((carry, range) => carry + range.size, 0);
+		return (normal as Array<Range>).reduce((carry, range) => carry + range.size, 0);
 	}
 
 	/**
@@ -68,11 +69,11 @@ class RangeCollection extends Range {
 	 * @returns {boolean} contains
 	 * @memberof RangeCollection
 	 */
-	contains(...values) {
+	contains(...values: Array<number>) {
 		const { normal } = storage.get(this);
 		const contains = values.filter(
 			(value) =>
-				normal.filter((range) => range.contains(value)).length > 0
+				(normal as Array<Range>).filter((range) => range.contains(value)).length > 0
 		);
 
 		return contains.length === values.length;
@@ -87,7 +88,7 @@ class RangeCollection extends Range {
 	toString(separator = '..', join = ',') {
 		const { normal } = storage.get(this);
 
-		return normal.map((range) => range.toString(separator)).join(join);
+		return (normal as Array<Range>).map((range) => range.toString(separator)).join(join);
 	}
 
 	/**
@@ -99,7 +100,7 @@ class RangeCollection extends Range {
 	toHex(length = 0, separator = '..', join = ',') {
 		const { normal } = storage.get(this);
 
-		return normal.map((range) => range.toHex(length, separator)).join(join);
+		return (normal as Array<Range>).map((range) => range.toHex(length, separator)).join(join);
 	}
 
 	/**
@@ -108,10 +109,10 @@ class RangeCollection extends Range {
 	 * @returns {string} collection
 	 * @memberof RangeCollection
 	 */
-	toJSON() {
+	toJSON(): any {
 		const { normal } = storage.get(this);
 
-		return normal.map((range) => range.toJSON());
+		return (normal as Array<Range>).map((range) => range.toJSON());
 	}
 
 	/**
@@ -124,7 +125,7 @@ class RangeCollection extends Range {
 	*[Symbol.iterator]() {
 		const { normal } = storage.get(this);
 		const { length } = normal;
-		const infinite = normal.some(({ size }) => size >= Infinity);
+		const infinite = (normal as Array<Range>).some(({ size }) => size >= Infinity);
 
 		if (infinite) {
 			throw new Error('RangeCollection is infinite');
@@ -143,7 +144,7 @@ class RangeCollection extends Range {
 	 * @returns {RangeCollection} collection
 	 * @memberof RangeCollection
 	 */
-	static from(...ranges) {
+	static from(...ranges: Array<Range | number>) {
 		return new this(
 			...ranges.map((range) =>
 				range instanceof Range ? range : new Range(Number(range))
@@ -161,7 +162,7 @@ class RangeCollection extends Range {
 	 * @returns {RangeCollection} collection
 	 * @memberof RangeCollection
 	 */
-	static fromString(ranges, separator = '..', join = ',') {
+	static fromString(ranges: string, separator = '..', join = ',') {
 		return new this(
 			...ranges
 				.split(join)
@@ -179,7 +180,7 @@ class RangeCollection extends Range {
 	 * @returns {RangeCollection} collection
 	 * @memberof RangeCollection
 	 */
-	static fromHex(ranges, separator = '..', join = ',') {
+	static fromHex(ranges: string, separator = '..', join = ',') {
 		return new this(
 			...ranges
 				.split(join)
@@ -195,12 +196,12 @@ class RangeCollection extends Range {
 	 * @returns {RangeCollection} collection
 	 * @memberof RangeCollection
 	 */
-	static fromJSON(json) {
-		const parsed = JSON.parse(json).map(
+	static fromJSON(json: string) {
+		const parsed: Array<Range> = (JSON.parse(json) as Array<{ min: number, max?: number }>).map(
 			({ min, max }) => new Range(min, max || min)
 		);
 
-		return new this(...[parsed]);
+		return new this(...parsed);
 	}
 
 	/**
@@ -211,11 +212,11 @@ class RangeCollection extends Range {
 	 * @returns {[Range]} ranges
 	 * @memberof RangeCollection
 	 */
-	static normalize(ranges) {
+	static normalize(ranges: Array<Range>): Array<Range> {
 		return ranges
 			.reduce((carry, range) => {
-				const intersect = carry.filter(
-					(r) =>
+				const intersect: Array<Range> = carry.filter(
+					(r: Range) =>
 						r.contains(range.min) ||
 						r.contains(range.max) ||
 						(r.max === range.min - 1 || r.min === range.max + 1)
@@ -235,11 +236,9 @@ class RangeCollection extends Range {
 				}
 
 				return carry.concat(range);
-			}, [])
-			.sort((one, two) =>
+			}, [] as Array<Range>)
+			.sort((one: Range, two: Range) =>
 				one.min < two.min ? -1 : +(one.min > two.min)
 			);
 	}
 }
-
-module.exports = RangeCollection;
