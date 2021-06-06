@@ -1,6 +1,42 @@
 import { RangeInterface } from '../Contract/RangeInterface';
 import { Range } from './Range';
 
+function cross(...ranges: Array<Range>): Range {
+	const values: Array<number> = ranges
+		.reduce((carry, { min, max }) => carry.concat(min, max), [] as Array<number>);
+
+	return new Range(...values);
+}
+
+function mergeable(one: Range, two: Range): boolean {
+	return one.contains(two.min)
+		|| one.contains(two.max)
+		|| one.min === two.max + 1
+		|| one.max === two.min - 1;
+}
+
+function optimize(...ranges: Array<Range>): Array<Range> {
+	return ranges
+		.reduce((carry, range) => {
+			const intersect = carry.filter((r) => mergeable(range, r));
+
+			if (intersect.length) {
+				return carry
+					.filter((range) => !intersect.includes(range))
+					.concat(cross(range, ...intersect));
+			}
+
+			return carry.concat(range);
+		}, [] as Array<Range>)
+		.sort(({ min: one }, { min: two }) => one < two ? -1 : Number(one > two));
+}
+
+function normalize(ranges: Array<Range | number>, allowEmpty: boolean = true): Array<Range> {
+	return ranges.length || allowEmpty
+		? optimize(...ranges.map((range) => range instanceof Range ? range : new Range(range)))
+		: [new Range()];
+}
+
 /**
  * Collection of Range objects
  *
@@ -22,9 +58,7 @@ export class RangeCollection implements RangeInterface {
 	 * @memberof RangeCollection
 	 */
 	constructor(...ranges: Array<Range | number>) {
-		const { constructor: { normalize } } = Object.getPrototypeOf(this);
-
-		this.ranges = normalize(ranges.length ? ranges : [new Range()]);
+		this.ranges = normalize(ranges, false);
 
 		this.min = Math.min(...this.ranges.map(({ min }) => min));
 		this.max = Math.max(...this.ranges.map(({ max }) => max));
@@ -172,37 +206,11 @@ export class RangeCollection implements RangeInterface {
 	 * Normalize multiple Range objects
 	 *
 	 * @static
-	 * @param {[Range]} ranges
-	 * @returns {[Range]} ranges
+	 * @param {Array<Range>} ranges
+	 * @returns {Array<Range>}
 	 * @memberof RangeCollection
 	 */
 	static normalize(ranges: Array<Range>): Array<Range> {
-		return ranges
-			.reduce((carry, range) => {
-				const intersect: Array<Range> = carry.filter(
-					(r: Range) =>
-						r.contains(range.min) ||
-						r.contains(range.max) ||
-						(r.max === range.min - 1 || r.min === range.max + 1)
-				);
-
-				if (intersect.length) {
-					const cross = intersect
-						.concat(range)
-						.reduce(
-							(carry, { min, max }) => carry.concat(min, max),
-							[] as Array<number>
-						);
-
-					return carry
-						.filter((comp) => intersect.indexOf(comp) < 0)
-						.concat(new Range(...cross));
-				}
-
-				return carry.concat(range);
-			}, [] as Array<Range>)
-			.sort((one: Range, two: Range) =>
-				one.min < two.min ? -1 : +(one.min > two.min)
-			);
+		return normalize(ranges);
 	}
 }
