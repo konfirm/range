@@ -94,28 +94,14 @@ export class Range {
 	 */
 	toHex(length = 0, separator = '..') {
 		const { min, max } = this;
-		const padding = [...Array(length + 1)].join('0');
+		const padding = Array.from({ length }, () => '0').join('')
+		const hex = (value: number) => value.toString(16)
+			.replace(/^(-)?([\da-f]+)$/, (_, m = '', h) =>
+				m + `${padding}${h}`.slice(-Math.max(length, h.length))
+			)
+			.replace(/^(-)?Infinity$/, '$1INF');
 
-		return [min, max]
-			.filter((value, index, all) => all.indexOf(value) === index)
-			.map((value) => {
-				const numeric = /^(-?)([0-9a-f]+)$/;
-				const normal = cast.string(String(value.toString(16)));
-
-				//  add padding (if needed) to true hexadecimal numbers,
-				//  never for (-)Infinity
-				if (numeric.test(normal)) {
-					const [, minus, abs] = normal.match(numeric) as RegExpMatchArray;
-
-					return (
-						minus +
-						`${padding}${abs}`.slice(-Math.max(abs.length, length))
-					);
-				}
-
-				return normal;
-			})
-			.join(separator);
+		return [...new Set([min, max])].map(hex).join(separator);
 	}
 
 	/**
