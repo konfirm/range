@@ -71,10 +71,7 @@ export class Range {
 	toString(separator = '..') {
 		const { min, max } = this;
 
-		return [min, max]
-			.filter((value, index, all) => all.indexOf(value) === index)
-			.map((value) => cast.string(value))
-			.join(separator);
+		return [...new Set([min, max])].map(cast.string).join(separator);
 	}
 
 	/**
@@ -104,9 +101,8 @@ export class Range {
 	 * @memberof Range
 	 */
 	toJSON() {
-		const { min: vmin, max: vmax } = this;
-		const min = cast.json(vmin);
-		const max = cast.json(vmax);
+		const min = cast.json(this.min);
+		const max = cast.json(this.max);
 
 		return min === max ? { min } : { min, max };
 	}
