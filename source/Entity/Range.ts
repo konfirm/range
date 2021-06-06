@@ -55,17 +55,10 @@ export class Range {
 	 * @returns {boolean} contains
 	 * @memberof Range
 	 */
-	contains(...values: Array<any>) {
+	contains(...values: Array<number>) {
 		const { min, max } = this;
 
-		return values.reduce(
-			(carry, value) =>
-				value === cast.numeric(value) &&
-				carry &&
-				min <= value &&
-				value <= max,
-			true
-		);
+		return values.every((value) => cast.numeric(value) === value && value >= min && value <= max);
 	}
 
 	/**
