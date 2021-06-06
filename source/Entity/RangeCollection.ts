@@ -1,14 +1,20 @@
+import { RangeInterface } from '../Contract/RangeInterface';
 import { Range } from './Range';
-
-const storage = new WeakMap();
 
 /**
  * Collection of Range objects
  *
+ * @export
  * @class RangeCollection
- * @extends {Range}
+ * @implements {RangeInterface}
  */
-export class RangeCollection extends Range {
+export class RangeCollection implements RangeInterface {
+	private readonly ranges: ReadonlyArray<Range>;
+
+	public readonly min: number;
+	public readonly max: number;
+	public readonly size: number;
+
 	/**
 	 * Creates an instance of RangeCollection
 	 *
@@ -16,50 +22,13 @@ export class RangeCollection extends Range {
 	 * @memberof RangeCollection
 	 */
 	constructor(...ranges: Array<Range | number>) {
-		super();
-
 		const { constructor: { normalize } } = Object.getPrototypeOf(this);
-		const normal = normalize(
-			ranges.length ? ranges : [new Range()]
-		);
 
-		storage.set(this, { normal });
-	}
+		this.ranges = normalize(ranges.length ? ranges : [new Range()]);
 
-	/**
-	 * The minimum value contained in all Range objects
-	 *
-	 * @readonly
-	 * @memberof RangeCollection
-	 */
-	get min() {
-		const { normal } = storage.get(this);
-
-		return Math.min(...(normal as Array<Range>).map(({ min }) => min));
-	}
-
-	/**
-	 * The maximum value contained in all Range objects
-	 *
-	 * @readonly
-	 * @memberof RangeCollection
-	 */
-	get max() {
-		const { normal } = storage.get(this);
-
-		return Math.max(...(normal as Array<Range>).map(({ max }) => max));
-	}
-
-	/**
-	 * The number of values within all Range objects
-	 *
-	 * @readonly
-	 * @memberof RangeCollection
-	 */
-	get size() {
-		const { normal } = storage.get(this);
-
-		return (normal as Array<Range>).reduce((carry, range) => carry + range.size, 0);
+		this.min = Math.min(...this.ranges.map(({ min }) => min));
+		this.max = Math.max(...this.ranges.map(({ max }) => max));
+		this.size = this.ranges.reduce((carry, range) => carry + range.size, 0);
 	}
 
 	/**
@@ -70,10 +39,9 @@ export class RangeCollection extends Range {
 	 * @memberof RangeCollection
 	 */
 	contains(...values: Array<number>) {
-		const { normal } = storage.get(this);
 		const contains = values.filter(
 			(value) =>
-				(normal as Array<Range>).filter((range) => range.contains(value)).length > 0
+				this.ranges.filter((range) => range.contains(value)).length > 0
 		);
 
 		return contains.length === values.length;
@@ -86,9 +54,8 @@ export class RangeCollection extends Range {
 	 * @memberof RangeCollection
 	 */
 	toString(separator = '..', join = ',') {
-		const { normal } = storage.get(this);
 
-		return (normal as Array<Range>).map((range) => range.toString(separator)).join(join);
+		return this.ranges.map((range) => range.toString(separator)).join(join);
 	}
 
 	/**
@@ -98,9 +65,8 @@ export class RangeCollection extends Range {
 	 * @memberof RangeCollection
 	 */
 	toHex(length = 0, separator = '..', join = ',') {
-		const { normal } = storage.get(this);
 
-		return (normal as Array<Range>).map((range) => range.toHex(length, separator)).join(join);
+		return this.ranges.map((range) => range.toHex(length, separator)).join(join);
 	}
 
 	/**
@@ -110,9 +76,8 @@ export class RangeCollection extends Range {
 	 * @memberof RangeCollection
 	 */
 	toJSON(): any {
-		const { normal } = storage.get(this);
 
-		return (normal as Array<Range>).map((range) => range.toJSON());
+		return this.ranges.map((range) => range.toJSON());
 	}
 
 	/**
@@ -123,16 +88,15 @@ export class RangeCollection extends Range {
 	 * @memberof RangeCollection
 	 */
 	*[Symbol.iterator]() {
-		const { normal } = storage.get(this);
-		const { length } = normal;
-		const infinite = (normal as Array<Range>).some(({ size }) => size >= Infinity);
+		const { length } = this.ranges;
+		const infinite = this.ranges.some(({ size }) => size >= Infinity);
 
 		if (infinite) {
 			throw new Error('RangeCollection is infinite');
 		}
 
 		for (let i = 0; i < length; ++i) {
-			yield* normal[i];
+			yield* this.ranges[i];
 		}
 	}
 
@@ -227,7 +191,7 @@ export class RangeCollection extends Range {
 						.concat(range)
 						.reduce(
 							(carry, { min, max }) => carry.concat(min, max),
-							[]
+							[] as Array<number>
 						);
 
 					return carry

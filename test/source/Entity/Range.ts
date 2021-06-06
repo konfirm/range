@@ -2,6 +2,8 @@ import * as test from 'tape';
 import each from 'template-literal-each';
 import { Range } from '../../../source/Entity/Range';
 
+type Keyed<T = unknown> = { [key: string]: T };
+
 const und = (() => { })();
 
 test('Range', (t) => {
@@ -46,7 +48,7 @@ test('Range', (t) => {
 			${0}         | ${Infinity} | ${0}         | ${Infinity} | ${Infinity} | 0..INF
 			${-Infinity} | ${0}        | ${-Infinity} | ${0}        | ${Infinity} | -INF..0
 		`((record) => {
-			const { inmin, inmax, min, max, size, string } = record as { string: string } & { [key: string]: number };
+			const { inmin, inmax, min, max, size, string } = record as { string: string } & Keyed<number>;
 			t.test(`new Range(${inmin}, ${inmax})`, (t) => {
 				const range = new Range(inmin, inmax);
 

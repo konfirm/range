@@ -1,13 +1,14 @@
-const storage = new WeakMap();
+type Numeric = number | string;
+
 const infinity = /^(-)?(Inf)(?:inity)?$/i;
 const cast = {
-	numeric: (value: string | number) =>
+	numeric: (value: Numeric) =>
 		infinity.test(String(value))
 			? Number(String(value).replace(infinity, '$1Infinity'))
 			: parseInt(String(value), 10),
-	string: (value: string) => String(value).replace(infinity, '$1INF'),
-	json: (value: string) =>
-		infinity.test(value) ? cast.string(value) : Number(value),
+	string: (value: Numeric) => String(value).replace(infinity, '$1INF'),
+	json: (value: Numeric) =>
+		infinity.test(String(value)) ? cast.string(value) : Number(value),
 	hex: (value: string) =>
 		infinity.test(value) ? cast.string(value) : parseInt(value, 16)
 };
@@ -18,55 +19,25 @@ const cast = {
  * @class Range
  */
 export class Range {
+	public readonly min: number;
+	public readonly max: number;
+	public readonly size: number;
+
 	/**
 	 * Creates an instance of Range
 	 *
 	 * @param {...number} values
 	 * @memberof Range
 	 */
-	constructor(...values: Array<string | number>) {
+	constructor(...values: Array<Numeric>) {
 		const mapped = values.length
 			? values.map(cast.numeric)
 			: [-Infinity, Infinity];
 		const int = mapped.filter((value) => typeof value === 'number');
 
-		storage.set(this, { min: Math.min(...int), max: Math.max(...int) });
-	}
-
-	/**
-	 * The minimum value of the range
-	 *
-	 * @readonly
-	 * @memberof Range
-	 */
-	get min() {
-		const { min } = storage.get(this);
-
-		return min;
-	}
-
-	/**
-	 * The maximum value of the range
-	 *
-	 * @readonly
-	 * @memberof Range
-	 */
-	get max() {
-		const { max } = storage.get(this);
-
-		return max;
-	}
-
-	/**
-	 * The number of values within the Range
-	 *
-	 * @readonly
-	 * @memberof Range
-	 */
-	get size() {
-		const { min, max } = this;
-
-		return max + 1 - min;
+		this.min = Math.min(...int);
+		this.max = Math.max(...int);
+		this.size = this.max + 1 - this.min;
 	}
 
 	/**
