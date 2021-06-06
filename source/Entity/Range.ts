@@ -13,11 +13,11 @@ const cast = {
 		infinity.test(value) ? cast.string(value) : parseInt(value, 16)
 };
 
-function first(...values: Array<unknown>): unknown {
+function first<T = unknown>(...values: Array<T>): T {
 	const und = Symbol('und');
-	const [first] = values.filter((value = und) => value !== und);
+	const [first] = values.filter((value: unknown = und) => value !== und);
 
-	return first;
+	return first as T;
 }
 
 /**
@@ -175,8 +175,8 @@ export class Range {
 		const { min, max } = JSON.parse(input);
 
 		return new this(
-			first(min, max, -Infinity) as Numeric,
-			first(max, min, Infinity) as Numeric,
+			first<Numeric>(min, max, -Infinity),
+			first<Numeric>(max, min, Infinity),
 		);
 	}
 }
