@@ -72,13 +72,8 @@ export class RangeCollection implements RangeInterface {
 	 * @returns {boolean} contains
 	 * @memberof RangeCollection
 	 */
-	contains(...values: Array<number>) {
-		const contains = values.filter(
-			(value) =>
-				this.ranges.filter((range) => range.contains(value)).length > 0
-		);
-
-		return contains.length === values.length;
+	contains(...values: Array<number>): boolean {
+		return values.every((value) => this.ranges.some((range) => range.contains(value)));
 	}
 
 	/**
@@ -87,8 +82,7 @@ export class RangeCollection implements RangeInterface {
 	 * @returns {string} collection
 	 * @memberof RangeCollection
 	 */
-	toString(separator = '..', join = ',') {
-
+	toString(separator: string = '..', join: string = ',') {
 		return this.ranges.map((range) => range.toString(separator)).join(join);
 	}
 
@@ -98,8 +92,7 @@ export class RangeCollection implements RangeInterface {
 	 * @returns {string} collection
 	 * @memberof RangeCollection
 	 */
-	toHex(length = 0, separator = '..', join = ',') {
-
+	toHex(length: number = 0, separator: string = '..', join: string = ',') {
 		return this.ranges.map((range) => range.toHex(length, separator)).join(join);
 	}
 
@@ -109,8 +102,7 @@ export class RangeCollection implements RangeInterface {
 	 * @returns {string} collection
 	 * @memberof RangeCollection
 	 */
-	toJSON(): any {
-
+	toJSON(): Array<ReturnType<Range['toJSON']>> {
 		return this.ranges.map((range) => range.toJSON());
 	}
 
@@ -123,7 +115,7 @@ export class RangeCollection implements RangeInterface {
 	 */
 	*[Symbol.iterator]() {
 		const { length } = this.ranges;
-		const infinite = this.ranges.some(({ size }) => size >= Infinity);
+		const infinite = this.ranges.some(({ size }) => !Number.isFinite(size));
 
 		if (infinite) {
 			throw new Error('RangeCollection is infinite');
@@ -142,12 +134,8 @@ export class RangeCollection implements RangeInterface {
 	 * @returns {RangeCollection} collection
 	 * @memberof RangeCollection
 	 */
-	static from(...ranges: Array<Range | number>) {
-		return new this(
-			...ranges.map((range) =>
-				range instanceof Range ? range : new Range(Number(range))
-			)
-		);
+	static from(...ranges: Array<Range | number>): RangeCollection {
+		return new this(...ranges.map((range) => range instanceof Range ? range : new Range(range)));
 	}
 
 	/**
@@ -160,12 +148,8 @@ export class RangeCollection implements RangeInterface {
 	 * @returns {RangeCollection} collection
 	 * @memberof RangeCollection
 	 */
-	static fromString(ranges: string, separator = '..', join = ',') {
-		return new this(
-			...ranges
-				.split(join)
-				.map((range) => Range.fromString(range, separator))
-		);
+	static fromString(ranges: string, separator: string = '..', join: string = ','): RangeCollection {
+		return new this(...ranges.split(join).map((range) => Range.fromString(range, separator)));
 	}
 
 	/**
@@ -178,12 +162,8 @@ export class RangeCollection implements RangeInterface {
 	 * @returns {RangeCollection} collection
 	 * @memberof RangeCollection
 	 */
-	static fromHex(ranges: string, separator = '..', join = ',') {
-		return new this(
-			...ranges
-				.split(join)
-				.map((range) => Range.fromHex(range, separator))
-		);
+	static fromHex(ranges: string, separator: string = '..', join: string = ','): RangeCollection {
+		return new this(...ranges.split(join).map((range) => Range.fromHex(range, separator)));
 	}
 
 	/**
@@ -194,7 +174,7 @@ export class RangeCollection implements RangeInterface {
 	 * @returns {RangeCollection} collection
 	 * @memberof RangeCollection
 	 */
-	static fromJSON(json: string) {
+	static fromJSON(json: string): RangeCollection {
 		const parsed: Array<Range> = (JSON.parse(json) as Array<unknown>)
 			.map((options) => Range.fromJSON(JSON.stringify(options)));
 

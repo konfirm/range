@@ -55,7 +55,7 @@ export class Range {
 	 * @returns {boolean} contains
 	 * @memberof Range
 	 */
-	contains(...values: Array<number>) {
+	contains(...values: Array<number>): boolean {
 		const { min, max } = this;
 
 		return values.every((value) => cast.numeric(value) === value && value >= min && value <= max);
@@ -68,7 +68,7 @@ export class Range {
 	 * @returns {string} string representation
 	 * @memberof Range
 	 */
-	toString(separator = '..') {
+	toString(separator: string = '..'): string {
 		const { min, max } = this;
 
 		return [...new Set([min, max])].map(cast.string).join(separator);
@@ -82,7 +82,7 @@ export class Range {
 	 * @returns {string} hexadecimal representation
 	 * @memberof Range
 	 */
-	toHex(length = 0, separator = '..') {
+	toHex(length: number = 0, separator: string = '..'): string {
 		const { min, max } = this;
 		const padding = Array.from({ length }, () => '0').join('')
 		const hex = (value: number) => value.toString(16)
@@ -100,7 +100,7 @@ export class Range {
 	 * @returns {*} JSONAble
 	 * @memberof Range
 	 */
-	toJSON() {
+	toJSON(): { min: Numeric, max?: Numeric } {
 		const min = cast.json(this.min);
 		const max = cast.json(this.max);
 
@@ -135,7 +135,7 @@ export class Range {
 	 * @returns
 	 * @memberof Range
 	 */
-	static fromString(input: string, separator = '..') {
+	static fromString(input: string, separator = '..'): Range {
 		return new this(...input.split(separator));
 	}
 
@@ -148,7 +148,7 @@ export class Range {
 	 * @returns
 	 * @memberof Range
 	 */
-	static fromHex(input: string, separator = '..') {
+	static fromHex(input: string, separator = '..'): Range {
 		return new this(...input.split(separator).map(cast.hex));
 	}
 
@@ -160,7 +160,7 @@ export class Range {
 	 * @returns
 	 * @memberof Range
 	 */
-	static fromJSON(input: string) {
+	static fromJSON(input: string): Range {
 		const { min, max } = JSON.parse(input);
 
 		return new this(
