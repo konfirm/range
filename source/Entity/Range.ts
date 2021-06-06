@@ -38,12 +38,11 @@ export class Range {
 	 */
 	constructor(...values: Array<Numeric>) {
 		const mapped = values.length
-			? values.map(cast.numeric)
+			? values.map(cast.numeric).filter((value) => typeof value === 'number')
 			: [-Infinity, Infinity];
-		const int = mapped.filter((value) => typeof value === 'number');
 
-		this.min = Math.min(...int);
-		this.max = Math.max(...int);
+		this.min = Math.min(...mapped);
+		this.max = Math.max(...mapped);
 		this.size = Number.isFinite(this.min) && Number.isFinite(this.max)
 			? this.max + 1 - this.min
 			: Infinity;
