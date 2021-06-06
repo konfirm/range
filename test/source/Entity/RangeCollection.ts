@@ -2,7 +2,8 @@ import * as test from 'tape';
 import each from 'template-literal-each';
 import { RangeCollection } from '../../../source/Entity/RangeCollection';
 import { Range } from '../../../source/Entity/Range';
-const und = (() => { })();
+
+type Keyed<T = unknown> = { [key: string]: T };
 
 test('RangeCollection', (t) => {
 	t.test('new RangeCollection()', (t) => {
@@ -267,6 +268,32 @@ test('RangeCollection', (t) => {
 			t.equal(collection.size, size, `size is ${size}`);
 
 			t.deepEqual([...collection], expectation);
+
+			t.end();
+		});
+
+		t.test('fromJSON - edge cases', (t) => {
+			each`
+				json             | min          | max          | size
+				-----------------|--------------|--------------|------
+				[{"min":0}]      | ${0}         | ${0}         | ${1}
+				[{"max":0}]      | ${0}         | ${0}         | ${1}
+				[]               | ${-Infinity} | ${Infinity}  | ${Infinity}
+				[{}]             | ${-Infinity} | ${Infinity}  | ${Infinity}
+				[{"min":"-INF"}] | ${-Infinity} | ${-Infinity} | ${Infinity}
+				[{"max":"-INF"}] | ${-Infinity} | ${-Infinity} | ${Infinity}
+				[{"min":"INF"}]  | ${Infinity}  | ${Infinity}  | ${Infinity}
+				[{"max":"INF"}]  | ${Infinity}  | ${Infinity}  | ${Infinity}
+			`((record) => {
+				const { json, min, max, size } = record as { json: string } & Keyed<number>;
+
+				const collection = RangeCollection.fromJSON(json);
+
+				t.ok(collection instanceof RangeCollection, 'is a RangeCollection');
+				t.equal(collection.min, min, `min is ${min}`);
+				t.equal(collection.max, max, `max is ${max}`);
+				t.equal(collection.size, size, `size is ${size}`);
+			});
 
 			t.end();
 		});

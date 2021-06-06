@@ -195,9 +195,8 @@ export class RangeCollection implements RangeInterface {
 	 * @memberof RangeCollection
 	 */
 	static fromJSON(json: string) {
-		const parsed: Array<Range> = (JSON.parse(json) as Array<{ min: number, max?: number }>).map(
-			({ min, max }) => new Range(min, max || min)
-		);
+		const parsed: Array<Range> = (JSON.parse(json) as Array<unknown>)
+			.map((options) => Range.fromJSON(JSON.stringify(options)));
 
 		return new this(...parsed);
 	}

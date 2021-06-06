@@ -13,6 +13,13 @@ const cast = {
 		infinity.test(value) ? cast.string(value) : parseInt(value, 16)
 };
 
+function first(...values: Array<unknown>): unknown {
+	const und = Symbol('und');
+	const [first] = values.filter((value = und) => value !== und);
+
+	return first;
+}
+
 /**
  * Numeric range
  *
@@ -37,7 +44,9 @@ export class Range {
 
 		this.min = Math.min(...int);
 		this.max = Math.max(...int);
-		this.size = this.max + 1 - this.min;
+		this.size = Number.isFinite(this.min) && Number.isFinite(this.max)
+			? this.max + 1 - this.min
+			: Infinity;
 	}
 
 	/**
@@ -180,6 +189,9 @@ export class Range {
 	static fromJSON(input: string) {
 		const { min, max } = JSON.parse(input);
 
-		return new this(min || max || -Infinity, max || min || Infinity);
+		return new this(
+			first(min, max, -Infinity) as Numeric,
+			first(max, min, Infinity) as Numeric,
+		);
 	}
 }
