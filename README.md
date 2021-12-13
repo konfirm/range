@@ -1,3 +1,6 @@
+![tests](https://github.com/konfirm/range/actions/workflows/tests.yml/badge.svg)
+![release](https://github.com/konfirm/range/actions/workflows/release.yml/badge.svg)
+
 # Range
 
 Define and work with number (integer) ranges easily. Instead of requiring the full ranges in memory it allows for easy checks on containment, size and can turn ranges (or collections of ranges) into short string notations.
@@ -32,6 +35,8 @@ small.contains(12345); //  false
 large.contains(12345); //  true
 combi.contains(12345); //  true
 ```
+
+**NOTE** While the examples use the `import` syntax, the `require` syntax has remained unchanged as the Range package is also published as CJS (CommonJS) package. Simply replace `import { ... } from '@konfirm/range';` to `const { ... } = require('@konfirm/range');`.
 
 ## Range
 
