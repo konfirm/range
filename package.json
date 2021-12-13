@@ -2,10 +2,24 @@
   "name": "@konfirm/range",
   "version": "1.0.0",
   "description": "",
-  "main": "source/main.js",
+  "main": "dist/cjs/main.js",
+  "module": "dist/esm/main.js",
+  "iife": "dist/main.js",
+  "types": "dist/main.d.ts",
   "scripts": {
-    "test": "nyc tape 'test/**/*.spec.js'",
-    "test:formatted": "nyc tape 'test/**/*.spec.js' | tap-nyc"
+    "test": "run-script-os",
+    "test:nix": "ts-node node_modules/tape/bin/tape 'test/**/*.ts'",
+    "test:win32": "ts-node node_modules/tape/bin/tape test/**/*.ts",
+    "test:coverage": "run-script-os",
+    "test:coverage:nix": "nyc --reporter=html --require ts-node/register tape 'test/**/*.ts' | tap-arc",
+    "test:coverage:win32": "nyc --reporter=html --require ts-node/register tape test/**/*.ts | tap-arc",
+    "test:pretty": "run-script-os",
+    "test:pretty:nix": "nyc --require ts-node/register tape 'test/**/*.ts' | tap-arc",
+    "test:pretty:win32": "nyc --require ts-node/register tape test/**/*.ts | tap-arc",
+    "prebuild": "tsc --declarationDir temp --declaration true --emitDeclarationOnly true",
+    "build": "rollup -c rollup.config.js",
+    "postbuild": "rm -rf temp",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -21,17 +35,23 @@
   "author": "Rogier Spieker <rogier@konfirm.eu>",
   "license": "MIT",
   "engines": {
-    "node": ">=8"
+    "node": ">=12"
   },
   "devDependencies": {
-    "eslint": "^7.8.1",
-    "eslint-config-prettier": "^6.4.0",
-    "eslint-config-strict": "^14.0.1",
-    "eslint-plugin-prettier": "^3.1.1",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "@types/tape": "^4.13.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.1.1",
-    "tap-nyc": "^1.0.3",
-    "tape": "^5.0.1",
-    "template-literal-each": "^1.0.8"
+    "rollup": "^2.52.2",
+    "rollup-plugin-dts": "^4.0.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "run-script-os": "^1.1.6",
+    "tap-arc": "^0.1.1",
+    "tape": "^5.3.1",
+    "template-literal-each": "^2.0.0",
+    "ts-node": "^10.4.0",
+    "tslib": "^2.3.0",
+    "typescript": "^4.4.4"
   }
 }

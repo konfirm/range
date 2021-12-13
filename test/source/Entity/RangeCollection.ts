@@ -1,8 +1,9 @@
-const test = require('tape');
-const each = require('template-literal-each');
-const RangeCollection = require('../../../source/Entity/RangeCollection.js');
-const Range = require('../../../source/Entity/Range.js');
-const und = (() => { })();
+import * as test from 'tape';
+import each from 'template-literal-each';
+import { RangeCollection } from '../../../source/Entity/RangeCollection';
+import { Range } from '../../../source/Entity/Range';
+
+type Keyed<T = unknown> = { [key: string]: T };
 
 test('RangeCollection', (t) => {
 	t.test('new RangeCollection()', (t) => {
@@ -46,7 +47,8 @@ test('RangeCollection', (t) => {
 			0, 50, 100, 200    | true
 			0, 100, 200, 300   | true
 			100, 150, 200, 300 | false
-		`(({ seek, verdict }) => {
+		`((record) => {
+			const { seek, verdict } = record as { [key: string]: string };
 			const contains = seek.split(/[, ]+/).map(Number);
 			const bool = verdict === 'true';
 
@@ -85,7 +87,8 @@ test('RangeCollection', (t) => {
 			-100, 100          | true
 			-50, 50            | true
 			-100, -50, 50, 100 | true
-		`(({ seek, verdict }) => {
+		`((record) => {
+			const { seek, verdict } = record as { [key: string]: string };
 			const contains = seek.split(/[, ]+/).map(Number);
 			const bool = verdict === 'true';
 
@@ -111,7 +114,8 @@ test('RangeCollection', (t) => {
 				     | /         | -54321/-20000,-12345/12345,20000/54321
 				#    | /         | -54321/-20000#-12345/12345#20000/54321
 				..   | ,         | -54321,-20000..-12345,12345..20000,54321
-			`(({ join, separator, string }) => {
+			`((record) => {
+				const { join, separator, string } = record as { [key: string]: string };
 				t.equal(collection.toString(separator, join), string, `toString(${join}, ${separator}) is "${string}"`);
 			});
 
@@ -147,8 +151,9 @@ test('RangeCollection', (t) => {
 				7      |      | /         | -000d431/-0004e20,-0003039/0003039,0004e20/000d431
 				7      | #    | /         | -000d431/-0004e20#-0003039/0003039#0004e20/000d431
 				7      | ..   | ,         | -000d431,-0004e20..-0003039,0003039..0004e20,000d431
-			`(({ length, join, separator, hex }) => {
-				const pad = length ? Number(length) : length;
+			`((record) => {
+				const { length, join, separator, hex } = record as { [key: string]: string }
+				const pad = (length && Number(length)) || undefined;
 
 				t.equal(collection.toHex(pad, separator, join), hex, `toHex(${join}, ${separator}) is "${hex}"`);
 			});
@@ -217,7 +222,8 @@ test('RangeCollection', (t) => {
 				0..5,10,15,20..25 |        |
 				0..5$10$15$20..25 | $      |
 				0/5$10$15$20/25   | $      | /
-			`(({ input, join, separator }) => {
+			`((record) => {
+				const { input, join, separator } = record as { [key: string]: string };
 				const collection = RangeCollection.fromString(input, separator, join);
 
 				t.ok(collection instanceof RangeCollection, 'is a RangeCollection');
@@ -238,7 +244,8 @@ test('RangeCollection', (t) => {
 				0..5,a,f,14..19 |        |
 				0..5$a$f$14..19 | $      |
 				0/5$a$f$14/19   | $      | /
-			`(({ input, join, separator }) => {
+			`((record) => {
+				const { input, join, separator } = record as { [key: string]: string };
 				const collection = RangeCollection.fromHex(input, separator, join);
 
 				t.ok(collection instanceof RangeCollection, 'is a RangeCollection');
@@ -265,6 +272,32 @@ test('RangeCollection', (t) => {
 			t.end();
 		});
 
+		t.test('fromJSON - edge cases', (t) => {
+			each`
+				json             | min          | max          | size
+				-----------------|--------------|--------------|------
+				[{"min":0}]      | ${0}         | ${0}         | ${1}
+				[{"max":0}]      | ${0}         | ${0}         | ${1}
+				[]               | ${-Infinity} | ${Infinity}  | ${Infinity}
+				[{}]             | ${-Infinity} | ${Infinity}  | ${Infinity}
+				[{"min":"-INF"}] | ${-Infinity} | ${-Infinity} | ${Infinity}
+				[{"max":"-INF"}] | ${-Infinity} | ${-Infinity} | ${Infinity}
+				[{"min":"INF"}]  | ${Infinity}  | ${Infinity}  | ${Infinity}
+				[{"max":"INF"}]  | ${Infinity}  | ${Infinity}  | ${Infinity}
+			`((record) => {
+				const { json, min, max, size } = record as { json: string } & Keyed<number>;
+
+				const collection = RangeCollection.fromJSON(json);
+
+				t.ok(collection instanceof RangeCollection, 'is a RangeCollection');
+				t.equal(collection.min, min, `min is ${min}`);
+				t.equal(collection.max, max, `max is ${max}`);
+				t.equal(collection.size, size, `size is ${size}`);
+			});
+
+			t.end();
+		});
+
 		t.test('normalize', (t) => {
 			each`
 				count | string              | ranges
@@ -274,7 +307,8 @@ test('RangeCollection', (t) => {
 				3     | 0..5,10..15,20..25  | ${[new Range(20, 25), new Range(0, 5), new Range(10, 15)]}
 				1     | 0..30               | ${[new Range(0, 10), new Range(21, 30), new Range(11, 20)]}
 				3     | 0..10,12..20,22..30 | ${[new Range(0, 10), new Range(22, 30), new Range(12, 20)]}
-			`(({ ranges, string, count }) => {
+			`((record) => {
+				const { ranges, string, count } = record as { ranges: Array<Range> } & { [key: string]: string };
 				const normal = RangeCollection.normalize(ranges);
 				const collection = RangeCollection.from(...normal);
 

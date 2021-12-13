@@ -1,7 +1,7 @@
-const test = require('tape');
-const main = require('../../source/main.js');
-const Range = require('../../source/Entity/Range.js');
-const RangeCollection = require('../../source/Entity/RangeCollection.js');
+import * as test from 'tape';
+import * as main from '../../source/main';
+import { Range } from '../../source/Entity/Range';
+import { RangeCollection } from '../../source/Entity/RangeCollection';
 
 test('main.js', (t) => {
 	t.ok(typeof main === 'object', 'exports an object');

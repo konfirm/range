@@ -15,7 +15,7 @@ $ npm install --save @konfirm/range
 The range package consists of two exported classes; `Range` and `RangeCollection`. A `Range` is created with zero or more numeric arguments, from which the minimum and maximum values are used to determine the full range. A `RangeCollection` is a wrapper for multiple `Range` instances providing the same API as `Range` so it can be used in the same places.
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const small = new Range(0, 100);
 const large = new Range(10000, 99999);
 const combi = new RangeCollection(small, large);
@@ -46,7 +46,7 @@ As `Infinity` is a recognized valid value (despite it not being an integer numbe
 Construct new Range instances by providing zero or more numeric values, the values will be processed using `parseInt(<value>, 10)` (ensuring decimal integers) and will contain every integer value from the minimum value up to and including the maximum value.
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(0, 10);
 
 range.contains(0); // true
@@ -57,7 +57,7 @@ range.contains(11); // false
 If more than two values are provided, Range will use only the lowest and highest values, ignoring everything in between.
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(0, 2, 3, 7, 8, 10);
 
 range.contains(0); // true
@@ -68,7 +68,7 @@ range.contains(11); // false
 If a single value is provided, the full range consists of that value
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(10);
 
 range.contains(9); // false
@@ -79,7 +79,7 @@ range.contains(11); // false
 If no values are provided, the Range will be from `-Infinity` to `Infinity`, basically containing every possible integer value. _Be very careful not to use an iterator on it, as that will try to generate an infite number of values, which means a never ending loop._
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range();
 
 range.contains(-Infinity); // true
@@ -97,7 +97,7 @@ A Range has various properties indication the `min`, `max` values and the `size`
 | `size`   | Number (integer) | the number of values represented by the Range |
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100, 199);
 
 range.min; //  100
@@ -114,7 +114,7 @@ Verify whether one or more values are within the Range min and max values (inclu
 | `...values` | `Number` |         | Zero or more number values to verify the containment in the Range |
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100, 199);
 
 range.contains(100); //  true
@@ -134,7 +134,7 @@ Casts a Range instance into its string representation. The separator can be spec
 | `separator` | `String` | `'..'`  | The separator between the Ranges' `min` and `max` values |
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100, 199);
 
 range.toString(); // '100..199'
@@ -146,7 +146,7 @@ String(range); // '100..199'
 Or with a different separator (note that specifying arguments only works when called manually)
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100, 199);
 
 range.toString('/'); // '100/199'
@@ -164,7 +164,7 @@ Like toString, but using a hexadecimal representation for the numbers. Optinally
 Specifying the length of the hexadecimal representation does not take the minus (`-`) into consideration, nor does it pad the `INF` symbol which represents `Infinity`.
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100, 199);
 
 range.toHex(); // '64..c7'
@@ -173,7 +173,7 @@ range.toHex(); // '64..c7'
 Or with a different length
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100, 199);
 
 range.toHex(4); // '0064..00c7'
@@ -183,7 +183,7 @@ range.toHex(7); // '0000064..00000c7'
 Or with a different separator
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100, 199);
 
 range.toHex(0, '/'); // '64/c7'
@@ -196,7 +196,7 @@ range.toHex(7, '/'); // '00000064/00000c7'
 Represent the Range in a JSON-able format.
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100, 199);
 
 range.toJSON(); // {min:100,max:199}
@@ -206,7 +206,7 @@ JSON.stringify(range); // '{"min":100,"max":199}'
 If the Range consists of a single value, only `min` will be specified
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(100);
 
 range.toJSON(); // {min:100}
@@ -218,7 +218,7 @@ JSON.stringify(range); // '{"min":100}'
 Range implements the [`Symbol.iterator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/iterator) method as generator, allowing it to be used in a `for..of` loop and for Array destructing
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = new Range(0, 5);
 
 for (const value of range) {
@@ -244,7 +244,7 @@ Create a Range instance from a string representation with decimal value format (
 | `separator` | `String` | `'..'`  | The separator between the Ranges' `min` and `max` values        |
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = Range.fromString('123..789');
 
 range.min; //  123
@@ -255,7 +255,7 @@ range.size; //  667
 Using a separator
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = Range.fromString('123/789', '/');
 
 range.min; //  123
@@ -273,7 +273,7 @@ Create a Range instance from a string representation with hexadecimal value form
 | `separator` | `String` | `'..'`  | The separator between the Ranges' `min` and `max` values            |
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = Range.fromHex('7b..315');
 
 range.min; //  123
@@ -284,7 +284,7 @@ range.size; //  667
 Using a separator
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = Range.fromHex('7b/315', '/');
 
 range.min; //  123
@@ -301,7 +301,7 @@ Create a Range instance from a string representation in JSON format (e.g. create
 | `range`  | `String` |         | The string representing the Range as JSON |
 
 ```js
-const { Range } = require('@konfirm/range');
+import { Range } from '@konfirm/range';
 const range = Range.fromJSON('{"min":123,"max":789}');
 
 range.min; //  123
@@ -318,7 +318,7 @@ A RangeCollection is a collection of zero or more `Range` instances, providing t
 Create new RangeCollections by providing zero or more Range instances.
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(new Range(0, 3), new Range(7, 10));
 
 collection.contains(0); // true
@@ -340,7 +340,7 @@ A RangeCollection has various properties indication the `min`, `max` values and 
 | `size`   | Number (integer) | the number of values represented by the RangeCollection    |
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -360,7 +360,7 @@ Verify whether one or more values are within the RangeCollection values.
 | `...values` | `Number` |         | Zero or more number values to verify the containment in the RangeCollection |
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -384,7 +384,7 @@ Casts a RangeCollection instance into its string representation. The separator c
 | `join`      | `String` | `','`   | The separator between the Ranges contained within the RangeCollection |
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -397,7 +397,7 @@ String(collection); //  '100..110,200..210'
 Using a different separator
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -409,7 +409,7 @@ collection.toString('/'); //  '100/110,200/210'
 Using a different join
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -430,7 +430,7 @@ Casts a RangeCollection instance into its string representation. The separator c
 | `join`      | `String` | `','`   | The separator between the Ranges contained within the RangeCollection |
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -442,7 +442,7 @@ collection.toHex(); //  '64..6e,c8..d2'
 With a different length
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -454,7 +454,7 @@ collection.toString(4); //  '0064..006e,00c8..00d2'
 With a different separator
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -467,7 +467,7 @@ collection.toString(4, ':'); //  '0064:006e,00c8:00d2'
 With a different join
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -482,7 +482,7 @@ collection.toString(4, ':', '/'); //  '0064:006e/00c8:00d2'
 Represent the RangeCollection in a JSON-able format.
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(
 	new Range(100, 110),
 	new Range(200, 210)
@@ -497,7 +497,7 @@ JSON.stringify(collection); // '[{"min":100,"max":110},{"min":200,"max":210}]'
 RangeCollection implements the [`Symbol.iterator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/iterator) method as generator, allowing it to be used in a `for..of` loop and for Array destructing
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = new RangeCollection(new Range(0, 3), new Range(7, 10));
 
 for (const value of collection) {
@@ -524,7 +524,7 @@ Create a RangeCollection instance from zero or more Range instances and/or numbe
 | `...values` | `Range|Number` |         | Zero or more Range instances and/or numbers |
 
 ```js
-const { Range, RangeCollection } = require('@konfirm/range');
+import { Range, RangeCollection } from '@konfirm/range';
 const collection = RangeCollection.from(
 	new Range(123, 345),
 	400,
@@ -548,7 +548,7 @@ Create a RangeCollection instance from a string representation with decimal valu
 | `join`      | `String` | `','`   | The join between the Ranges                                               |
 
 ```js
-const { RangeCollection } = require('@konfirm/range');
+import { RangeCollection } from '@konfirm/range';
 const collection = RangeCollection.fromString('123..345,400,500,789..890');
 
 collection.min; //  123
@@ -559,7 +559,7 @@ collection.size; //  327
 Using a separator
 
 ```js
-const { RangeCollection } = require('@konfirm/range');
+import { RangeCollection } from '@konfirm/range';
 const collection = RangeCollection.fromString('123:345,400,500,789:890', ':');
 
 collection.min; //  123
@@ -570,7 +570,7 @@ collection.size; //  327
 Using a join
 
 ```js
-const { RangeCollection } = require('@konfirm/range');
+import { RangeCollection } from '@konfirm/range';
 const collection = RangeCollection.fromString(
 	'123:345/400/500/789:890',
 	':',
@@ -593,7 +593,7 @@ Create a RangeCollection instance from a string representation with hexadecimal 
 | `join`      | `String` | `','`   | The join between the Ranges                                                   |
 
 ```js
-const { RangeCollection } = require('@konfirm/range');
+import { RangeCollection } from '@konfirm/range';
 const collection = RangeCollection.fromHex('7b..159,190,1f4,315..37a');
 
 collection.min; //  123
@@ -604,7 +604,7 @@ collection.size; //  327
 Using a separator
 
 ```js
-const { RangeCollection } = require('@konfirm/range');
+import { RangeCollection } from '@konfirm/range';
 const collection = RangeCollection.fromHex('7b:159,190,1f4,315:37a', ':');
 
 collection.min; //  123
@@ -615,7 +615,7 @@ collection.size; //  327
 Using a join
 
 ```js
-const { RangeCollection } = require('@konfirm/range');
+import { RangeCollection } from '@konfirm/range';
 const collection = RangeCollection.fromHex('7b:159/190/1f4/315:37a', ':', '/');
 
 collection.min; //  123
@@ -632,20 +632,20 @@ Create a RangeCollection instance from a string representation in JSON format (e
 | `range`  | `String` |         | The string representing the RangeCollection as JSON |
 
 ```js
-const { RangeCollection } = require('@konfirm/range');
+import { RangeCollection } from '@konfirm/range';
 const collection = RangeCollection.fromJSON('[{"min":123,"max":345},{"min":400},{"min":500},{"min":789,"max":890}]');
 
 collection.min; //  123
 collection.max; //  890
 collection.size; //  327
+```
 
 # License
 
-MIT License Copyright (c) 2019 Rogier Spieker (Konfirm)
+MIT License Copyright (c) 2019-2021 Rogier Spieker (Konfirm)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-```
